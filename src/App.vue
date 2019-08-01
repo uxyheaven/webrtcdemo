@@ -47,12 +47,16 @@ export default {
       }, // 细节查看 MediaTrackConstraints
       rtcOptions: {
         type: 'video',
+        // 流媒体MediaStreamRecorder, 立体声StereoAudioRecorder, WebAssemblyRecorder,
+        // CanvasRecorder, GifRecorder, WhammyRecorder
+        recorderType: RecordRTC.MediaStreamRecorder,
         mimeType: `video/mpeg`, // 格式
         audioBitsPerSecond: 64 * 1024, // 音频码率, default 256 * 8 * 1024
         videoBitsPerSecond: 896 * 1024, // 视频码率, default 256 * 8 * 1024
-        frameInterval: 10, // 绘制的间隔, default 10
-        numberOfAudioChannels: 1, // 声道, default 2
-        getNativeBlob: false,
+        // getNativeBlob: true,
+        // 以下属性不是对所有的 Recorder都有效
+        // frameInterval: 10, // 绘制的间隔(CanvasRecorder / WhammyRecorder), default 10
+        // numberOfAudioChannels: 1, // 声道(StereoAudioRecorder), default 2
       },
     };
   },
@@ -90,7 +94,6 @@ export default {
         this.video.muted = true;
         this.video.volume = 0;
         this.video.srcObject = camera;
-        // RecordRTC 换成 MediaStreamRecorder 也可以?
         this.recorder = RecordRTC(camera, this.rtcOptions);
         this.recorder.startRecording();
         // release camera on stopRecording
