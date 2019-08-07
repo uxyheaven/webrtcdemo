@@ -128,6 +128,7 @@ export default {
         this.$refs.canvas.width,
         this.$refs.canvas.height,
       );
+      // let base64 = this.$refs.canvas.toDataURL('images/png');
     },
   },
 };
