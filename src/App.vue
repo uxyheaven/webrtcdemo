@@ -3,9 +3,11 @@
     <button @click="onStartRecording" :disabled="videoStart">start</button>
     <button @click="onStopRecording" :disabled="!videoStart">stop</button>
     <button @click="onSave">save</button>
+    <button @click="onScreenshot">screenshot</button>
     <video class="video" autoplay playsinline ref="video"></video>
     <div>duration: {{duration}}ms</div>
     <div>size: {{size}}</div>
+    <canvas class="video" ref="canvas"></canvas>
     <!-- <div>
       <label for="sel">格式:</label>
       <select name id="sel">
@@ -115,6 +117,16 @@ export default {
       RecordRTC.invokeSaveAsDialog(
         this.recorder.getBlob(),
         `RecordRTC_${new Date().getTime()}.webm`,
+      );
+    },
+    onScreenshot() {
+      let ctx = this.$refs.canvas.getContext('2d');
+      ctx.drawImage(
+        this.video,
+        0,
+        0,
+        this.$refs.canvas.width,
+        this.$refs.canvas.height,
       );
     },
   },
