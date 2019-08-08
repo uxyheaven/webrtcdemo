@@ -61,8 +61,8 @@ export default {
     captureCamera(callback) {
       navigator.mediaDevices
         .getUserMedia(this.userMediaOptions)
-        .then(function(camera) {
-          callback(camera);
+        .then(function(stream) {
+          callback(stream);
         })
         .catch(error => {
           this.$message.error('未找到视频设备');
@@ -76,21 +76,21 @@ export default {
       // window.open(URL.createObjectURL(this.recorder.getBlob()));
       this.size = RecordRTC.bytesToSize(this.recorder.getBlob().size);
 
-      // this.recorder.camera.stop();
-      // this.recorder.destroy();
+      this.recorder.stream.stop();
+      this.recorder.destroy();
       // this.recorder = null;
     },
     onStartRecording() {
       console.log(`video: ${this.video}`);
       this.videoStart = true;
-      this.captureCamera(camera => {
+      this.captureCamera(stream => {
         this.video.muted = true;
         this.video.volume = 0;
-        this.video.srcObject = camera;
-        this.recorder = RecordRTC(camera, this.rtcOptions);
+        this.video.srcObject = stream;
+        this.recorder = RecordRTC(stream, this.rtcOptions);
         this.recorder.startRecording();
         // release camera on stopRecording
-        this.recorder.camera = camera;
+        this.recorder.stream = stream;
         setTimeout(() => {
           if (!this.videoStart) {
             return;
