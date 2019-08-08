@@ -41,7 +41,7 @@ export default {
         // 流媒体MediaStreamRecorder, 立体声StereoAudioRecorder, WebAssemblyRecorder,
         // CanvasRecorder, GifRecorder, WhammyRecorder
         recorderType: RecordRTC.MediaStreamRecorder,
-        mimeType: `video/mpeg`, // 格式
+        mimeType: `video/webm`, // 格式
         audioBitsPerSecond: 64 * 1024, // 音频码率, default 256 * 8 * 1024
         videoBitsPerSecond: 896 * 1024, // 视频码率, default 256 * 8 * 1024
         timeSlice: 3.6e6, // 获取blobs的时间间隔, 单位ms, default 3.6e+6
