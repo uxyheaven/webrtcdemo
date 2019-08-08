@@ -72,7 +72,7 @@ export default {
       this.video.src = this.video.srcObject = null;
       this.video.muted = false;
       this.video.volume = 1;
-      this.video.src = URL.createObjectURL(this.recorder.getBlob());
+      this.video.src = this.recorder.toURL();
       // window.open(URL.createObjectURL(this.recorder.getBlob()));
       this.size = RecordRTC.bytesToSize(this.recorder.getBlob().size);
 
