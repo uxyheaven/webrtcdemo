@@ -76,7 +76,7 @@ export default {
       this.size = RecordRTC.bytesToSize(this.recorder.getBlob().size);
 
       this.recorder.camera.stop();
-      // this.recorder.destroy();
+      this.recorder.destroy();
       // this.recorder = null;
     },
     onStartRecording() {
