@@ -6,6 +6,7 @@
     <button @click="onSave">save</button>
     <button @click="onScreenshot">screenshot</button>
     <video class="video" autoplay playsinline ref="video"></video>
+    <video class="video" autoplay playsinline ref="video2"></video>
     <div>duration: {{duration}}ms</div>
     <div>size: {{size}}</div>
     <canvas class="video" ref="canvas"></canvas>
@@ -21,6 +22,7 @@ export default {
   data() {
     return {
       video: null,
+      video2: null,
       videoStart: false,
       recorder: null,
       size: '', // 文件体积
@@ -56,6 +58,7 @@ export default {
   created() {},
   mounted() {
     this.video = this.$refs.video;
+    this.video2 = this.$refs.video2;
   },
   methods: {
     captureCamera(callback) {
@@ -68,17 +71,21 @@ export default {
           this.$message.error('未找到视频设备');
         });
     },
-    stopRecordingCallback() {
+    stopRecordingCallback(recording) {
       this.video.src = this.video.srcObject = null;
-      this.video.muted = false;
-      this.video.volume = 1;
-      // URL.createObjectURL 已经过期
-      // this.video.src = URL.createObjectURL(this.recorder.getBlob());
-      // window.open(URL.createObjectURL(this.recorder.getBlob()));
+      try {
+        // URL.createObjectURL 已经过期
+        console.log(recording);
+        this.video2.src = recording;
+        // window.open(URL.createObjectURL(this.recorder.getBlob()));
+      } catch (error) {
+        console.log(error);
+      }
+
       this.size = RecordRTC.bytesToSize(this.recorder.getBlob().size);
 
-      this.recorder.stream.stop();
-      this.recorder.destroy();
+      // this.recorder.stream.stop();
+      // this.recorder.destroy();
       // this.recorder = null;
     },
     onStartRecording() {
