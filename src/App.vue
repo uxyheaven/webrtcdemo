@@ -8,17 +8,6 @@
     <div>duration: {{duration}}ms</div>
     <div>size: {{size}}</div>
     <canvas class="video" ref="canvas"></canvas>
-    <!-- <div>
-      <label for="sel">格式:</label>
-      <select name id="sel">
-        <option value="video/webm;codecs=vp9">video/webm;codecs=vp9</option>
-        <option value="video/webm;codecs=vp8">video/webm;codecs=vp8</option>
-        <option value="video/webm;codecs=h264" selected>video/webm;codecs=h264</option>
-        <option value="video/x-matroska;codecs=avc1">video/x-matroska;codecs=avc1</option>
-        <option value="video/mpeg">video/mpeg</option>
-        <option value="video/mp4">video/mp4</option>
-      </select>
-    </div>-->
   </div>
 </template>
  
