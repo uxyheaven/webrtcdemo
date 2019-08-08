@@ -1,5 +1,6 @@
 <template>
   <div class="record-page" style="margin-bottom: 15px;">
+    <div>1</div>
     <button @click="onStartRecording" :disabled="videoStart">start</button>
     <button @click="onStopRecording" :disabled="!videoStart">stop</button>
     <button @click="onSave">save</button>
