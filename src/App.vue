@@ -75,8 +75,8 @@ export default {
       // window.open(URL.createObjectURL(this.recorder.getBlob()));
       this.size = RecordRTC.bytesToSize(this.recorder.getBlob().size);
 
-      this.recorder.camera.stop();
-      this.recorder.destroy();
+      // this.recorder.camera.stop();
+      // this.recorder.destroy();
       // this.recorder = null;
     },
     onStartRecording() {
