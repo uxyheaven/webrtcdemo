@@ -1,6 +1,7 @@
+
 <template>
   <div class="record-page" style="margin-bottom: 15px;">
-    <div>1</div>
+    <div>2</div>
     <button @click="onStartRecording" :disabled="videoStart">start</button>
     <button @click="onStopRecording" :disabled="!videoStart">stop</button>
     <button @click="onSave">save</button>
@@ -14,6 +15,7 @@
 </template>
  
 <script>
+/* eslint-disable no-console */
 import RecordRTC from 'recordrtc';
 import VConsole from 'vconsole';
 let vConsole = new VConsole();
@@ -59,17 +61,41 @@ export default {
   mounted() {
     this.video = this.$refs.video;
     this.video2 = this.$refs.video2;
+    if (!this.detectWebRTC()) {
+      // console.log('不支持webrtc');
+    }
   },
   methods: {
-    captureCamera(callback) {
-      navigator.mediaDevices
-        .getUserMedia(this.userMediaOptions)
-        .then(function(stream) {
-          callback(stream);
-        })
-        .catch(error => {
-          this.$message.error('未找到视频设备');
-        });
+    // 监测webrtc
+    detectWebRTC() {
+      const WEBRTC_CONSTANTS = [
+        'RTCPeerConnection',
+        'webkitRTCPeerConnection',
+        'mozRTCPeerConnection',
+        'RTCIceGatherer',
+      ];
+
+      const isWebRTCSupported = WEBRTC_CONSTANTS.find(item => {
+        return item in window;
+      });
+
+      const isGetUserMediaSupported =
+        navigator &&
+        navigator.mediaDevices &&
+        navigator.mediaDevices.getUserMedia;
+
+      if (
+        !isWebRTCSupported ||
+        typeof isGetUserMediaSupported === 'undefined'
+      ) {
+        return false;
+      }
+
+      return true;
+    },
+    // 获取摄像头
+    captureCamera() {
+      return navigator.mediaDevices.getUserMedia(this.userMediaOptions);
     },
     stopRecordingCallback(recording) {
       this.video.src = this.video.srcObject = null;
@@ -84,28 +110,27 @@ export default {
 
       this.size = RecordRTC.bytesToSize(this.recorder.getBlob().size);
 
-      // this.recorder.stream.stop();
-      // this.recorder.destroy();
+      this.recorder.stream.stop();
+      this.recorder.destroy();
       // this.recorder = null;
     },
     onStartRecording() {
       console.log(`video: ${this.video}`);
       this.videoStart = true;
-      this.captureCamera(stream => {
-        this.video.muted = true;
-        this.video.volume = 0;
-        this.video.srcObject = stream;
-        this.recorder = RecordRTC(stream, this.rtcOptions);
-        this.recorder.startRecording();
-        // release camera on stopRecording
-        this.recorder.stream = stream;
-        setTimeout(() => {
-          if (!this.videoStart) {
-            return;
-          }
-          this.onStopRecording();
-        }, this.duration);
-      });
+      let that = this;
+      this.captureCamera()
+        .then(function(stream) {
+          that.recorder = RecordRTC(stream, that.rtcOptions);
+          that.recorder.stream = stream;
+          that.video.srcObject = stream;
+          that.recorder
+            .setRecordingDuration(that.duration)
+            .onRecordingStopped(that.onStopRecording);
+          that.recorder.startRecording();
+        })
+        .catch(error => {
+          console.log(error);
+        });
     },
     onStopRecording() {
       this.videoStart = false;
