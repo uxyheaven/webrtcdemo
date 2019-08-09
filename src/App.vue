@@ -1,10 +1,17 @@
 
 <template>
   <div class="record-page" style="margin-bottom: 15px;">
-    <div>3</div>
+    <div>4</div>
     <div>
+      格式
       <select name="mimeType" v-model="mimeType">
         <option :value="item.name" v-for="item in mimeTypeList" v-bind:key="item.name">{{item.name}}</option>
+      </select>
+    </div>
+    <div>
+      规格
+      <select name="specification" v-model="specification">
+        <option :value="item" v-for="item in specificationList" v-bind:key="item.name">{{item.name}}</option>
       </select>
     </div>
     <div>
@@ -15,7 +22,6 @@
     </div>
 
     <video class="video" autoplay playsinline ref="video"></video>
-    <video class="video" autoplay playsinline ref="video2"></video>
     <div>duration: {{duration}}ms</div>
     <div>size: {{size}}</div>
     <canvas class="video" ref="canvas"></canvas>
@@ -28,19 +34,33 @@ import RecordRTC from 'recordrtc';
 import VConsole from 'vconsole';
 let vConsole = new VConsole();
 
+let rtcOptions = {
+  type: 'video',
+  // 流媒体MediaStreamRecorder, 立体声StereoAudioRecorder, WebAssemblyRecorder,
+  // CanvasRecorder, GifRecorder, WhammyRecorder
+  recorderType: RecordRTC.MediaStreamRecorder,
+  mimeType: 'video/webm', // 格式
+  audioBitsPerSecond: 64 * 1024, // 音频码率, default 256 * 8 * 1024
+  videoBitsPerSecond: 576 * 1024, // 视频码率, default 256 * 8 * 1024
+  timeSlice: 3.6e6, // 获取blobs的时间间隔, 单位ms, default 3.6e+6
+  // getNativeBlob: true,
+  // 以下属性不是对所有的 Recorder都有效
+  // frameInterval: 10, // 绘制的间隔(CanvasRecorder / WhammyRecorder), default 10
+  // numberOfAudioChannels: 1, // 声道(StereoAudioRecorder), default 2
+};
+
 export default {
   data() {
     return {
       video: null,
-      video2: null,
       videoStart: false,
       recorder: null,
-      size: '', // 文件体积
+      size: null, // 文件体积
       duration: 5000, // 拍摄时间, 单位ms
       userMediaOptions: {
         video: {
-          width: 360,
-          height: 480,
+          width: 240,
+          height: 320,
           frameRate: 10, // 帧率
         },
         audio: {
@@ -49,37 +69,45 @@ export default {
           sampleSize: 16, // 采样位数
         },
       }, // 细节查看 MediaTrackConstraints
-      rtcOptions: {
-        type: 'video',
-        // 流媒体MediaStreamRecorder, 立体声StereoAudioRecorder, WebAssemblyRecorder,
-        // CanvasRecorder, GifRecorder, WhammyRecorder
-        recorderType: RecordRTC.MediaStreamRecorder,
-        mimeType: this.mimeType, // 格式
-        audioBitsPerSecond: 64 * 1024, // 音频码率, default 256 * 8 * 1024
-        videoBitsPerSecond: 896 * 1024, // 视频码率, default 256 * 8 * 1024
-        timeSlice: 3.6e6, // 获取blobs的时间间隔, 单位ms, default 3.6e+6
-        // getNativeBlob: true,
-        // 以下属性不是对所有的 Recorder都有效
-        // frameInterval: 10, // 绘制的间隔(CanvasRecorder / WhammyRecorder), default 10
-        // numberOfAudioChannels: 1, // 声道(StereoAudioRecorder), default 2
-      },
-      mimeType: '', // 媒体格式
+
+      mimeType: 'video/webm', // 媒体格式
       mimeTypeList: [
         { name: 'video/webm' },
         { name: 'video/webm;codecs=vp9' },
         { name: 'video/webm;codecs=vp8' },
-        { name: 'video/webm;codecs=h264' },
+        { name: 'video/webm;codecs=h264' }, // 建议这个兼容性最好
         { name: 'video/x-matroska;codecs=avc1' },
         { name: 'video/mpeg' },
         { name: 'video/mp4' },
+      ],
+      specification: null, // 视频规格
+      specificationList: [
+        {
+          name: '240p',
+          size: {
+            width: 240,
+            height: 320,
+          },
+          video: 576 * 1024,
+          audio: 64 * 1024,
+        },
+        {
+          name: '360p',
+          size: {
+            width: 480,
+            height: 360,
+          },
+          video: 704 * 1024,
+          audio: 64 * 1024,
+        },
       ],
     };
   },
   created() {},
   mounted() {
     this.video = this.$refs.video;
-    this.video2 = this.$refs.video2;
     this.mimeType = this.mimeTypeList[0].name;
+    this.specification = this.specificationList[0];
     if (!this.detectWebRTC()) {
       console.log('不支持webrtc');
     }
@@ -121,7 +149,7 @@ export default {
       try {
         // URL.createObjectURL 已经过期
         console.log(recording);
-        this.video2.src = recording;
+        this.video.src = recording;
         // window.open(URL.createObjectURL(this.recorder.getBlob()));
       } catch (error) {
         console.log(error);
@@ -139,7 +167,7 @@ export default {
       let that = this;
       this.captureCamera()
         .then(function(stream) {
-          that.recorder = RecordRTC(stream, that.rtcOptions);
+          that.recorder = RecordRTC(stream, rtcOptions);
           that.recorder.stream = stream;
           that.video.srcObject = stream;
           that.recorder
