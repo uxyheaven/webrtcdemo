@@ -1,11 +1,19 @@
 
 <template>
   <div class="record-page" style="margin-bottom: 15px;">
-    <div>2</div>
-    <button @click="onStartRecording" :disabled="videoStart">start</button>
-    <button @click="onStopRecording" :disabled="!videoStart">stop</button>
-    <button @click="onSave">save</button>
-    <button @click="onScreenshot">screenshot</button>
+    <div>3</div>
+    <div>
+      <select name="mimeType" v-model="mimeType">
+        <option :value="item.name" v-for="item in mimeTypeList" v-bind:key="item.name">{{item.name}}</option>
+      </select>
+    </div>
+    <div>
+      <button @click="onStartRecording" :disabled="videoStart">start</button>
+      <button @click="onStopRecording" :disabled="!videoStart">stop</button>
+      <button @click="onSave">save</button>
+      <button @click="onScreenshot">screenshot</button>
+    </div>
+
     <video class="video" autoplay playsinline ref="video"></video>
     <video class="video" autoplay playsinline ref="video2"></video>
     <div>duration: {{duration}}ms</div>
@@ -46,7 +54,7 @@ export default {
         // 流媒体MediaStreamRecorder, 立体声StereoAudioRecorder, WebAssemblyRecorder,
         // CanvasRecorder, GifRecorder, WhammyRecorder
         recorderType: RecordRTC.MediaStreamRecorder,
-        mimeType: `video/webm`, // 格式
+        mimeType: this.mimeType, // 格式
         audioBitsPerSecond: 64 * 1024, // 音频码率, default 256 * 8 * 1024
         videoBitsPerSecond: 896 * 1024, // 视频码率, default 256 * 8 * 1024
         timeSlice: 3.6e6, // 获取blobs的时间间隔, 单位ms, default 3.6e+6
@@ -55,14 +63,25 @@ export default {
         // frameInterval: 10, // 绘制的间隔(CanvasRecorder / WhammyRecorder), default 10
         // numberOfAudioChannels: 1, // 声道(StereoAudioRecorder), default 2
       },
+      mimeType: '', // 媒体格式
+      mimeTypeList: [
+        { name: 'video/webm' },
+        { name: 'video/webm;codecs=vp9' },
+        { name: 'video/webm;codecs=vp8' },
+        { name: 'video/webm;codecs=h264' },
+        { name: 'video/x-matroska;codecs=avc1' },
+        { name: 'video/mpeg' },
+        { name: 'video/mp4' },
+      ],
     };
   },
   created() {},
   mounted() {
     this.video = this.$refs.video;
     this.video2 = this.$refs.video2;
+    this.mimeType = this.mimeTypeList[0].name;
     if (!this.detectWebRTC()) {
-      // console.log('不支持webrtc');
+      console.log('不支持webrtc');
     }
   },
   methods: {
