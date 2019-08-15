@@ -83,33 +83,8 @@ export default {
       recorder: null,
       size: null, // 文件体积
       duration: 5000, // 拍摄时间, 单位ms
-      userMediaOptions: {
-        video: {
-          width: 240,
-          height: 320,
-          frameRate: 10, // 帧率
-        },
-        audio: {
-          channelCount: 1, // 声道
-          sampleRate: 64 * 1024, // 采样率
-          sampleSize: 16, // 采样位数
-        },
-      }, // 细节查看 MediaTrackConstraints
-      rtcOptions: {
-        type: 'video',
-        // 流媒体MediaStreamRecorder, 立体声StereoAudioRecorder, WebAssemblyRecorder,
-        // CanvasRecorder, GifRecorder, WhammyRecorder
-        recorderType: RecordRTC.MediaStreamRecorder,
-        mimeType: 'video/webm', // 格式
-        audioBitsPerSecond: 64 * 1024, // 音频码率, default 256 * 8 * 1024
-        videoBitsPerSecond: 576 * 1024, // 视频码率, default 256 * 8 * 1024
-        timeSlice: 3.6e6, // 获取blobs的时间间隔, 单位ms, default 3.6e+6
-        // getNativeBlob: true,
-        // 以下属性不是对所有的 Recorder都有效
-        // frameInterval: 10, // 绘制的间隔(CanvasRecorder / WhammyRecorder), default 10
-        // numberOfAudioChannels: 1, // 声道(StereoAudioRecorder), default 2
-      },
-      mimeType: 'video/webm', // 媒体格式
+
+      mimeType: null, // 媒体格式
       specification: null, // 视频规格
     };
   },
@@ -177,7 +152,7 @@ export default {
       let that = this;
       this.captureCamera()
         .then(function(stream) {
-          that.recorder = RecordRTC(stream, that.rtcOptions);
+          that.recorder = RecordRTC(stream, that.rtcOptions());
           that.recorder.stream = stream;
           that.video.srcObject = stream;
           that.recorder
@@ -215,6 +190,36 @@ export default {
     },
     specificationList() {
       return specificationList;
+    },
+    rtcOptions() {
+      return {
+        type: 'video',
+        // 流媒体MediaStreamRecorder, 立体声StereoAudioRecorder, WebAssemblyRecorder,
+        // CanvasRecorder, GifRecorder, WhammyRecorder
+        recorderType: RecordRTC.MediaStreamRecorder,
+        mimeType: this.mimeType, // 格式
+        audioBitsPerSecond: 64 * 1024, // 音频码率, default 256 * 8 * 1024
+        videoBitsPerSecond: 576 * 1024, // 视频码率, default 256 * 8 * 1024
+        timeSlice: 3.6e6, // 获取blobs的时间间隔, 单位ms, default 3.6e+6
+        // getNativeBlob: true,
+        // 以下属性不是对所有的 Recorder都有效
+        // frameInterval: 10, // 绘制的间隔(CanvasRecorder / WhammyRecorder), default 10
+        // numberOfAudioChannels: 1, // 声道(StereoAudioRecorder), default 2
+      };
+    },
+    userMediaOptions() {
+      return {
+        video: {
+          width: 240,
+          height: 320,
+          frameRate: 10, // 帧率
+        },
+        audio: {
+          channelCount: 1, // 声道
+          sampleRate: 64 * 1024, // 采样率
+          sampleSize: 16, // 采样位数
+        },
+      }; // 细节查看 MediaTrackConstraints
     },
   },
 };
