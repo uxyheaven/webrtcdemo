@@ -127,7 +127,7 @@ export default {
     },
     // 获取摄像头
     captureCamera() {
-      return navigator.mediaDevices.getUserMedia(this.userMediaOptions);
+      return navigator.mediaDevices.getUserMedia(this.userMediaOptions());
     },
     stopRecordingCallback(recording) {
       this.video.src = this.video.srcObject = null;
